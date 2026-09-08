@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title id="title">AJ monogram</title>
+  <rect width="160" height="160" rx="18" fill="#171318"/>
+  <path d="M31 124 68 30h22l36 94h-23l-8-23H60l-8 23H31Zm36-43h21L78 51 67 81Z" fill="#7b35ad"/>
+  <path d="M120 31v59c0 25-12 39-35 39-16 0-28-7-34-20l18-10c4 7 8 10 15 10 9 0 14-6 14-20V31h22Z" fill="#d5a62f"/>
+  <path d="M26 132h108" stroke="#d5a62f" stroke-width="5" stroke-linecap="square"/>
+</svg>
