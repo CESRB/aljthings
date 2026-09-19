@@ -48,10 +48,12 @@ export default function Home() {
     const id = Number(url.searchParams.get("add"));
     const item = items.find((candidate) => candidate.id === id);
     if (!item || item.status !== "available") return;
-    setBag((current) => ({ ...current, [id]: true }));
-    setOpen(true);
-    url.searchParams.delete("add");
-    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    queueMicrotask(() => {
+      setBag((current) => ({ ...current, [id]: true }));
+      setOpen(true);
+      url.searchParams.delete("add");
+      window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    });
   }, []);
   return (
     <main>

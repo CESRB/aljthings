@@ -1,6 +1,7 @@
 import { ArrowLeft, Check, MapPin, ShieldCheck, Truck } from "lucide-react";
 import { findListing, fulfillmentLabel, listings } from "@/lib/catalog";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 export function generateStaticParams() {
   return listings.map((item) => ({ slug: item.slug }));
@@ -23,12 +24,12 @@ export default async function ProductPage({
         <span>Local pickup · Shipping on select items</span>
       </div>
       <header>
-        <a href="/" className="wordmark">
+        <Link href="/" className="wordmark">
           <img src="/brand/aj-logo-horizontal.png" alt="AJ's Closet & Things" />
-        </a>
-        <a className="backLink" href="/#finds">
+        </Link>
+        <Link className="backLink" href="/#finds">
           <ArrowLeft /> All listings
-        </a>
+        </Link>
       </header>
       <div className="productLayout">
         <section className="gallery">
@@ -86,9 +87,9 @@ export default async function ProductPage({
         </section>
       </div>
       <footer>
-        <a href="/" className="wordmark light">
+        <Link href="/" className="wordmark light">
           <img src="/brand/aj-logo-horizontal.png" alt="AJ's Closet & Things" />
-        </a>
+        </Link>
         <p>Secondhand goods · Local pickup and select shipping</p>
         <small>
           <a href="https://tech.cesrb.com">CESRB//BUILT</a>
