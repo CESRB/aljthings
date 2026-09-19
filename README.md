@@ -18,16 +18,26 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 npm run build
-npm start
+npx serve out
 ```
 
 ## Project structure
 
-- `app/` — pages, cart interactions, and styling
-- `lib/catalog.ts` — sample listing data
+- `app/` — pages, CESRB Commerce checkout, and styling
+- `lib/content.ts` — CESRB Content snapshot, Storefront, Lists, Blog, and Gallery adapters
+- `lib/commerce.ts` — same-origin Pagesby Commerce cart and checkout adapter
+- `lib/catalog.ts` — launch-preview listing data used only while no products are published
 - `public/brand/` — AJ's Closet & Things logo assets
 - `public/listings/` — sample product photography
 
-The current inventory is sample content and should be replaced before launch.
+Production content is owned by CESRB Content under the `aljthings` site. Published
+products replace preview inventory automatically; published Lists, Gallery images,
+Blog posts, and Site Content render without a code change. Checkout uses the
+Pagesby same-origin `/_cesrb/commerce/*` gateway and redirects to the payment URL
+returned by CESRB Commerce/Billing. Card data is never collected by this site.
+
+The preview inventory is intentionally non-purchasable. Before customer launch,
+complete Onboarding activation so Commerce provisions the store, configure at
+least one shipping or pickup method, and publish real inventory in Content.
 
 Built by [CESRB](https://tech.cesrb.com).

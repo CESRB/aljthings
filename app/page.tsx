@@ -11,9 +11,15 @@ import {
 } from "lucide-react";
 import {
   contentProductToListing,
+  contentMediaUrl,
   contentText,
   loadContent,
+  loadGallery,
+  type ContentCollection,
+  type ContentPost,
+  type GalleryItem,
 } from "@/lib/content";
+import { addCommerceItem, removeCommerceItem } from "@/lib/commerce";
 import {
   categories as previewCategories,
   fulfillmentLabel,
@@ -23,10 +29,14 @@ import {
 export default function Home() {
   const [cat, setCat] = useState("Everything"),
     [query, setQuery] = useState(""),
-    [bag, setBag] = useState<Record<string, boolean>>({}),
+    [bag, setBag] = useState<Record<string, { commerceItemId?: string }>>({}),
     [open, setOpen] = useState(false),
     [items, setItems] = useState<Listing[]>(previewItems),
     [content, setContent] = useState<Record<string, unknown>>({}),
+    [collections, setCollections] = useState<ContentCollection[]>([]),
+    [posts, setPosts] = useState<ContentPost[]>([]),
+    [gallery, setGallery] = useState<GalleryItem[]>([]),
+    [commerceError, setCommerceError] = useState(""),
     [usingPreview, setUsingPreview] = useState(true),
     [contentState, setContentState] = useState<"loading" | "ready" | "error">("loading");
   const cats = useMemo(
@@ -47,34 +57,67 @@ export default function Home() {
       (sum, id) => sum + (items.find((i) => String(i.id) === id)?.price || 0),
       0,
     );
-  const add = (id: string) => {
-    setBag((current) => ({ ...current, [id]: true }));
+  const add = async (id: string) => {
+    const item = items.find((candidate) => String(candidate.id) === id);
+    if (!item || bag[id]) return;
+    setCommerceError("");
+    if (item.commerce) {
+      try {
+        const result = await addCommerceItem(item);
+        setBag((current) => ({ ...current, [id]: { commerceItemId: result.itemId } }));
+      } catch {
+        setCommerceError("Checkout is still being activated for this store. Please try again shortly.");
+        setOpen(true);
+        return;
+      }
+    } else {
+      setBag((current) => ({ ...current, [id]: {} }));
+    }
     setOpen(true);
   };
-  const remove = (id: string) =>
+  const remove = async (id: string) => {
+    const commerceItemId = bag[id]?.commerceItemId;
+    if (commerceItemId) {
+      try { await removeCommerceItem(commerceItemId); } catch { setCommerceError("That item could not be removed. Please refresh and try again."); return; }
+    }
     setBag((current) => {
       const next = { ...current };
       delete next[id];
       return next;
     });
+  };
   useEffect(() => {
     const controller = new AbortController();
+    const requestedAdd = new URL(window.location.href).searchParams.get("add");
     loadContent(controller.signal)
       .then((snapshot) => {
         setContent(snapshot.content || {});
+        setCollections(snapshot.collections || []);
+        setPosts(snapshot.blog || []);
         const products=(snapshot.storefront?.products || []).filter((item) => item.availability !== "hidden");
+        const resolvedItems = products.length ? products.map(contentProductToListing) : previewItems;
         if (products.length) {
-          setItems(products.map(contentProductToListing));
+          setItems(resolvedItems);
           setUsingPreview(false);
+        }
+        const requestedItem = requestedAdd ? resolvedItems.find((candidate) => String(candidate.id) === requestedAdd || candidate.slug === requestedAdd) : undefined;
+        if (requestedItem) {
+          if (requestedItem.commerce) {
+            void addCommerceItem(requestedItem).then((result) => {
+              setBag((current) => ({ ...current, [String(requestedItem.id)]: { commerceItemId: result.itemId } }));
+              setOpen(true);
+            }).catch(() => { setCommerceError("Checkout is still being activated for this store. Please try again shortly."); setOpen(true); });
+          } else {
+            setBag((current) => ({ ...current, [String(requestedItem.id)]: {} }));
+            setOpen(true);
+          }
         }
         setContentState("ready");
       })
       .catch((error) => {
         if (error?.name !== "AbortError") setContentState("error");
       });
-    const url = new URL(window.location.href);
-    const id = url.searchParams.get("add");
-    if (id) queueMicrotask(() => setBag((current) => ({ ...current, [id]: true })));
+    loadGallery(controller.signal).then(setGallery).catch(() => setGallery([]));
     return () => controller.abort();
   }, []);
   return (
@@ -119,6 +162,15 @@ export default function Home() {
         <strong>Each listing is for one unique item.</strong>
         <p>Real photos, clear condition notes, straightforward prices.</p>
       </section>
+      {!!gallery.length && (
+        <section className="managedSection" id="gallery">
+          <p className="kicker purple">Gallery</p>
+          <h2>Recent finds</h2>
+          <div className="managedGallery">
+            {gallery.map((item) => <figure key={item.id}><img src={item.url} alt={item.alt_text} /><figcaption><strong>{item.title}</strong>{item.caption && <span>{item.caption}</span>}</figcaption></figure>)}
+          </div>
+        </section>
+      )}
       <section className="market" id="finds">
         <div className="marketHead">
           <div>
@@ -190,6 +242,21 @@ export default function Home() {
           </p>
         )}
       </section>
+      {collections.map((collection) => collection.items?.length ? (
+        <section className="managedSection" key={collection.key}>
+          <p className="kicker gold">{collection.name}</p>
+          {collection.description && <p className="managedIntro">{collection.description}</p>}
+          <div className="managedCards">
+            {collection.items.map((item) => <article key={item.id}>{Object.entries(item.values).map(([key, value]) => typeof value === "string" ? <p key={key}><strong>{key.replaceAll("_", " ")}</strong><span>{value}</span></p> : null)}</article>)}
+          </div>
+        </section>
+      ) : null)}
+      {!!posts.length && (
+        <section className="managedSection">
+          <p className="kicker purple">Updates</p>
+          <div className="managedCards">{posts.map((post) => <article key={post.id}>{post.featured_image && <img src={contentMediaUrl(post.featured_image.url)} alt={post.featured_image.alt_text} />}<h3>{post.title}</h3>{post.excerpt && <p>{post.excerpt}</p>}</article>)}</div>
+        </section>
+      )}
       <section className="how" id="how">
         <div>
           <p className="kicker gold">How shopping works</p>
@@ -300,11 +367,9 @@ export default function Home() {
               <span>Subtotal</span>
               <strong>${total.toFixed(2)}</strong>
             </div>
-            <p>
-              Checkout activates after the real inventory and fulfillment rules
-              are connected.
-            </p>
-            <button disabled>Checkout coming soon</button>
+            {commerceError && <p className="checkoutError" role="alert">{commerceError}</p>}
+            <p>{usingPreview ? "Checkout is unavailable for sample inventory." : "Secure checkout opens after shipping or pickup details are confirmed."}</p>
+            <a className={usingPreview ? "checkoutButton disabled" : "checkoutButton"} href={usingPreview ? undefined : "/checkout"} aria-disabled={usingPreview}>Continue to checkout</a>
           </div>
         )}
       </aside>
