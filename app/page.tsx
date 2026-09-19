@@ -165,8 +165,8 @@ export default function Home() {
       </section>
       {!!gallery.length && (
         <section className="managedSection" id="gallery">
-          <p className="kicker purple">Gallery</p>
-          <h2>Recent finds</h2>
+          <p className="kicker purple">{contentText(content, "gallery.kicker", "Gallery")}</p>
+          <h2>{contentText(content, "gallery.heading", "Recent finds")}</h2>
           <div className="managedGallery">
             {gallery.map((item) => <figure key={item.id}><img src={item.url} alt={item.alt_text} /><figcaption><strong>{item.title}</strong>{item.caption && <span>{item.caption}</span>}</figcaption></figure>)}
           </div>
@@ -175,15 +175,15 @@ export default function Home() {
       <section className="market" id="finds">
         <div className="marketHead">
           <div>
-            <p className="kicker purple">Current listings</p>
-            <h2>Shop all</h2>
+            <p className="kicker purple">{contentText(content, "products.kicker", "Current listings")}</p>
+            <h2>{contentText(content, "products.heading", "Shop all")}</h2>
           </div>
           <label>
             <Search />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search the collection"
+              placeholder={contentText(content, "products.search_placeholder", "Search the collection")}
             />
           </label>
         </div>
@@ -254,7 +254,7 @@ export default function Home() {
       ) : null)}
       {!!posts.length && (
         <section className="managedSection">
-          <p className="kicker purple">Updates</p>
+          <p className="kicker purple">{contentText(content, "blog.heading", "Updates")}</p>
           <div className="managedCards">{posts.map((post) => <article key={post.id}>{post.featured_image && <img src={contentMediaUrl(post.featured_image.url)} alt={post.featured_image.alt_text} />}<h3>{post.title}</h3>{post.excerpt && <p>{post.excerpt}</p>}</article>)}</div>
         </section>
       )}
@@ -273,30 +273,22 @@ export default function Home() {
           <li>
             <b>01</b>
             <div>
-              <h3>Review the listing</h3>
-              <p>
-                Photos, condition, measurements, and any flaws are shown up
-                front.
-              </p>
+              <h3>{contentText(content, "how.step_one.heading", "Review the listing")}</h3>
+              <p>{contentText(content, "how.step_one.body", "Photos, condition, measurements, and any flaws are shown up front.")}</p>
             </div>
           </li>
           <li>
             <b>02</b>
             <div>
-              <h3>Choose shipping or pickup</h3>
-              <p>
-                Shippable items can go to checkout. Larger finds stay local.
-              </p>
+              <h3>{contentText(content, "how.step_two.heading", "Choose shipping or pickup")}</h3>
+              <p>{contentText(content, "how.step_two.body", "Shippable items can go to checkout. Larger finds stay local.")}</p>
             </div>
           </li>
           <li>
             <b>03</b>
             <div>
-              <h3>Available while listed</h3>
-              <p>
-                Most listings are single items. Sold listings are removed from
-                the shop.
-              </p>
+              <h3>{contentText(content, "how.step_three.heading", "Available while listed")}</h3>
+              <p>{contentText(content, "how.step_three.body", "Most listings are single items. Sold listings are removed from the shop.")}</p>
             </div>
           </li>
         </ol>
@@ -320,7 +312,7 @@ export default function Home() {
         </a>
         <p>{contentText(content, "footer.tagline", "Secondhand goods · Local pickup and select shipping")}</p>
         <small>
-          Store preview · <a href="https://tech.cesrb.com">CESRB//BUILT</a>
+          {contentText(content, "footer.status", "Store preview")} · <a href="https://tech.cesrb.com">CESRB//BUILT</a>
         </small>
       </footer>
       {open && <div className="scrim" onClick={() => setOpen(false)} />}
