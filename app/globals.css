@@ -320,7 +320,7 @@ h2 {
   object-fit: cover;
 }
 .art.photo.previewArt img {
-  height: 230%;
+  height: 320%;
   object-position: center top;
 }
 .art span {
