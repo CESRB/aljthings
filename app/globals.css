@@ -319,6 +319,10 @@ h2 {
   display: block;
   object-fit: cover;
 }
+.art.photo.previewArt img {
+  height: 230%;
+  object-position: center top;
+}
 .art span {
   position: absolute;
   left: 0.8rem;
