@@ -2,7 +2,7 @@ export type Fulfillment = "shipping" | "pickup" | "both";
 export type ListingStatus = "available" | "reserved" | "sold";
 
 export type Listing = {
-  id: number;
+  id: number | string;
   slug: string;
   name: string;
   category: string;
