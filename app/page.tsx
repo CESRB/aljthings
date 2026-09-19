@@ -12,6 +12,7 @@ import {
 import {
   contentProductToListing,
   contentMediaUrl,
+  contentImage,
   contentText,
   loadContent,
   loadGallery,
@@ -123,17 +124,17 @@ export default function Home() {
   return (
     <main>
       <div className="topline">
-        <span>New listings added regularly</span>
-        <span>Local pickup · Shipping on select items</span>
+        <span>{contentText(content, "announcement.primary", "New listings added regularly")}</span>
+        <span>{contentText(content, "announcement.secondary", "Local pickup · Shipping on select items")}</span>
       </div>
       <header>
         <a href="#top" className="wordmark">
-          <img src="/brand/aj-logo-horizontal.png" alt="AJ's Closet & Things" />
+          <img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} />
         </a>
         <nav>
-          <a href="#finds">The finds</a>
-          <a href="#how">How it works</a>
-          <a href="#about">Buying info</a>
+          <a href="#finds">{contentText(content, "navigation.shop", "The finds")}</a>
+          <a href="#how">{contentText(content, "navigation.how", "How it works")}</a>
+          <a href="#about">{contentText(content, "navigation.about", "Buying info")}</a>
         </nav>
         <button className="bagBtn" onClick={() => setOpen(true)}>
           <ShoppingBag />
@@ -142,25 +143,25 @@ export default function Home() {
         </button>
       </header>
       <section className="hero" id="top">
-        <div className="heroMark"><img src="/brand/aj-monogram-spaced.png" alt="" /></div>
+        <div className="heroMark"><img src={contentImage(content, "brand.monogram", "/brand/aj-monogram-spaced.png").url} alt={contentImage(content, "brand.monogram", "/brand/aj-monogram-spaced.png").alt} /></div>
         <div className="heroCopy">
-          <p className="kicker">AJ’s Closet & Things</p>
+          <p className="kicker">{contentText(content, "home.hero.kicker", "AJ’s Closet & Things")}</p>
           <h1>
             {contentText(content, "home.hero.heading", "Shop current")}
             <br />
-            <em>listings.</em>
+            <em>{contentText(content, "home.hero.emphasis", "listings.")}</em>
           </h1>
           <p>
             {contentText(content, "home.hero.subheading", "Browse a changing selection of quality secondhand goods, available for shipping or local pickup.")}
           </p>
           <a href="#finds">
-            Browse current listings <ArrowRight />
+            {contentText(content, "home.hero.cta", "Browse current listings")} <ArrowRight />
           </a>
         </div>
       </section>
       <section className="intro">
-        <strong>Each listing is for one unique item.</strong>
-        <p>Real photos, clear condition notes, straightforward prices.</p>
+        <strong>{contentText(content, "home.intro.heading", "Each listing is for one unique item.")}</strong>
+        <p>{contentText(content, "home.intro.body", "Real photos, clear condition notes, straightforward prices.")}</p>
       </section>
       {!!gallery.length && (
         <section className="managedSection" id="gallery">
@@ -259,13 +260,13 @@ export default function Home() {
       )}
       <section className="how" id="how">
         <div>
-          <p className="kicker gold">How shopping works</p>
+          <p className="kicker gold">{contentText(content, "how.kicker", "How shopping works")}</p>
           <h2>
-            Find it.
+            {contentText(content, "how.line_one", "Find it.")}
             <br />
-            Review it.
+            {contentText(content, "how.line_two", "Review it.")}
             <br />
-            Make it yours.
+            {contentText(content, "how.line_three", "Make it yours.")}
           </h2>
         </div>
         <ol>
@@ -301,12 +302,12 @@ export default function Home() {
         </ol>
       </section>
       <section className="about" id="about">
-        <p className="kicker purple">Buying information</p>
+        <p className="kicker purple">{contentText(content, "about.kicker", "Buying information")}</p>
         <div>
           <h2>
-            Clear details
+            {contentText(content, "about.heading_one", "Clear details")}
             <br />
-            before you buy.
+            {contentText(content, "about.heading_two", "before you buy.")}
           </h2>
           <p>
             {contentText(content, "about.body", "Listings include current photos, measurements when relevant, condition details, and any known flaws. Shippable items show delivery options at checkout. Furniture and other oversized items are marked for local pickup.")}
@@ -315,9 +316,9 @@ export default function Home() {
       </section>
       <footer>
         <a href="#top" className="wordmark light">
-          <img src="/brand/aj-logo-horizontal.png" alt="AJ's Closet & Things" />
+          <img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} />
         </a>
-        <p>Secondhand goods · Local pickup and select shipping</p>
+        <p>{contentText(content, "footer.tagline", "Secondhand goods · Local pickup and select shipping")}</p>
         <small>
           Store preview · <a href="https://tech.cesrb.com">CESRB//BUILT</a>
         </small>
