@@ -321,7 +321,7 @@ h2 {
 }
 .art.photo.previewArt img {
   height: 320%;
-  object-position: center top;
+  object-position: center;
 }
 .art span {
   position: absolute;
