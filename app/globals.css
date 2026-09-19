@@ -320,8 +320,11 @@ h2 {
   object-fit: cover;
 }
 .art.photo.previewArt img {
-  height: 320%;
+  position: absolute;
+  inset: 0;
+  height: 100%;
   object-position: center;
+  transform: scale(3.2);
 }
 .art.photo.previewArt.shoes img,
 .art.photo.previewArt.sunglasses img {
