@@ -14,6 +14,12 @@ export type Listing = {
   image: string;
   description: string;
   details: string[];
+  commerce?: {
+    productId: string;
+    publishedRevisionId: string;
+    variantId: string;
+    variantRevision: string;
+  };
 };
 
 // Preview adapter. Replace this export with the CESRB Content response at launch.
