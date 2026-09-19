@@ -55,6 +55,24 @@ export function contentMediaUrl(path: string | undefined) {
   return path ? new URL(path, CONTENT_ORIGIN).href : "/brand/aj-monogram-spaced.png";
 }
 
+export function contentImage(
+  content: Record<string, unknown>,
+  key: string,
+  fallback: string,
+) {
+  const value = content[key];
+  if (value && typeof value === "object" && "url" in value) {
+    const image = value as { url?: unknown; alt_text?: unknown };
+    if (typeof image.url === "string" && image.url) {
+      return {
+        url: contentMediaUrl(image.url),
+        alt: typeof image.alt_text === "string" ? image.alt_text : "",
+      };
+    }
+  }
+  return { url: fallback, alt: "" };
+}
+
 export async function loadContent(signal?: AbortSignal): Promise<ContentSnapshot> {
   const response = await fetch(
     `${CONTENT_ORIGIN}/public/v1/sites/${CONTENT_SITE}/snapshot?frontend=2`,

@@ -1,6 +1,6 @@
 import { ArrowLeft, Check, MapPin, ShieldCheck, Truck } from "lucide-react";
 import { findListing, fulfillmentLabel, listings } from "@/lib/catalog";
-import { contentProductToListing, loadContent } from "@/lib/content";
+import { contentImage, contentProductToListing, contentText, loadContent } from "@/lib/content";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
@@ -22,16 +22,18 @@ export async function generateStaticParams() {
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const managed = await managedListings();
+  const snapshot = await loadContent().catch(() => ({ content: {}, storefront: { products: [] } }));
+  const content = snapshot.content || {};
+  const managed = (snapshot.storefront?.products || []).filter((product) => product.availability !== "hidden").map(contentProductToListing);
   const item = managed.find((candidate) => candidate.slug === slug) || findListing(slug);
   if (!item) notFound();
   const canBuy = item.status === "available";
 
   return (
     <main className="productPage">
-      <div className="topline"><span>New listings added regularly</span><span>Local pickup · Shipping on select items</span></div>
+      <div className="topline"><span>{contentText(content, "announcement.primary", "New listings added regularly")}</span><span>{contentText(content, "announcement.secondary", "Local pickup · Shipping on select items")}</span></div>
       <header>
-        <Link href="/" className="wordmark"><img src="/brand/aj-logo-horizontal.png" alt="AJ's Closet & Things" /></Link>
+        <Link href="/" className="wordmark"><img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} /></Link>
         <Link className="backLink" href="/#finds"><ArrowLeft /> All listings</Link>
       </header>
       <div className="productLayout">
@@ -54,7 +56,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <p className="buyerNote"><ShieldCheck /> Each listing includes current photos and clear condition details.</p>
         </section>
       </div>
-      <footer><Link href="/" className="wordmark light"><img src="/brand/aj-logo-horizontal.png" alt="AJ's Closet & Things" /></Link><p>Secondhand goods · Local pickup and select shipping</p><small><a href="https://tech.cesrb.com">CESRB//BUILT</a></small></footer>
+      <footer><Link href="/" className="wordmark light"><img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} /></Link><p>{contentText(content, "footer.tagline", "Secondhand goods · Local pickup and select shipping")}</p><small><a href="https://tech.cesrb.com">CESRB//BUILT</a></small></footer>
     </main>
   );
 }

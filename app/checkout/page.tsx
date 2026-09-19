@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { shippingQuotes, startCheckout, type ShippingAddress, type ShippingQuote } from "@/lib/commerce";
+import { contentImage, loadContent } from "@/lib/content";
 
 const emptyAddress: ShippingAddress = { recipientName: "", line1: "", city: "", region: "", postalCode: "", countryCode: "US" };
 
@@ -14,6 +15,13 @@ export default function CheckoutPage() {
   const [method, setMethod] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [content, setContent] = useState<Record<string, unknown>>({});
+
+  useEffect(() => {
+    const controller = new AbortController();
+    loadContent(controller.signal).then((snapshot) => setContent(snapshot.content || {})).catch(() => undefined);
+    return () => controller.abort();
+  }, []);
 
   async function quote(event: FormEvent) {
     event.preventDefault(); setBusy(true); setError("");
@@ -39,7 +47,7 @@ export default function CheckoutPage() {
   );
 
   return <main className="checkoutPage">
-    <header><Link href="/" className="wordmark"><img src="/brand/aj-logo-horizontal.png" alt="AJ's Closet & Things" /></Link><Link href="/">Back to shop</Link></header>
+    <header><Link href="/" className="wordmark"><img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} /></Link><Link href="/">Back to shop</Link></header>
     <form className="checkoutCard" onSubmit={quote}>
       <p className="kicker purple">Secure checkout</p><h1>Delivery details</h1>
       <div className="checkoutFields"><label>Full name<input required value={name} onChange={(e) => setName(e.target.value)} /></label><label>Email<input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>{field("line1", "Street address")}{field("line2", "Apartment / suite", false)}{field("city", "City")}{field("region", "State")}{field("postalCode", "ZIP code")}{field("countryCode", "Country")}</div>
