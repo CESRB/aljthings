@@ -203,7 +203,7 @@ export default function Home() {
           {shown.map((i) => (
             <article className={"listing " + i.status} key={i.id}>
               <a className="artLink" href={"/products/" + i.slug}>
-                <div className={`art photo ${usingPreview ? "previewArt" : ""}`}>
+                <div className={`art photo ${usingPreview ? `previewArt ${i.art}` : ""}`}>
                   <img src={i.image} alt={i.name} />
                   <span>{i.condition}</span>
                   {i.status !== "available" && (

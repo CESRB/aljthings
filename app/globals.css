@@ -323,6 +323,10 @@ h2 {
   height: 320%;
   object-position: center;
 }
+.art.photo.previewArt.shoes img,
+.art.photo.previewArt.sunglasses img {
+  object-position: center bottom;
+}
 .art span {
   position: absolute;
   left: 0.8rem;
