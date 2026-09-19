@@ -2,7 +2,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
-  MapPin,
   Plus,
   Search,
   ShoppingBag,
@@ -10,15 +9,23 @@ import {
   X,
 } from "lucide-react";
 import {
-  categories as cats,
-  fulfillmentLabel,
-  listings as items,
-} from "@/lib/catalog";
+  contentMediaUrl,
+  contentText,
+  loadContent,
+  type ContentProduct,
+} from "@/lib/content";
 export default function Home() {
   const [cat, setCat] = useState("Everything"),
     [query, setQuery] = useState(""),
-    [bag, setBag] = useState<Record<number, boolean>>({}),
-    [open, setOpen] = useState(false);
+    [bag, setBag] = useState<Record<string, boolean>>({}),
+    [open, setOpen] = useState(false),
+    [items, setItems] = useState<ContentProduct[]>([]),
+    [content, setContent] = useState<Record<string, unknown>>({}),
+    [contentState, setContentState] = useState<"loading" | "ready" | "error">("loading");
+  const cats = useMemo(
+    () => ["Everything", ...Array.from(new Set(items.map((item) => item.category).filter(Boolean))) as string[]],
+    [items],
+  );
   const shown = useMemo(
     () =>
       items.filter(
@@ -26,34 +33,38 @@ export default function Home() {
           (cat === "Everything" || i.category === cat) &&
           i.name.toLowerCase().includes(query.toLowerCase()),
       ),
-    [cat, query],
+    [cat, query, items],
   );
   const count = Object.keys(bag).length,
     total = Object.keys(bag).reduce(
-      (sum, id) => sum + items.find((i) => i.id === Number(id))!.price,
+      (sum, id) => sum + (items.find((i) => i.id === id)?.price_cents || 0) / 100,
       0,
     );
-  const add = (id: number) => {
+  const add = (id: string) => {
     setBag((current) => ({ ...current, [id]: true }));
     setOpen(true);
   };
-  const remove = (id: number) =>
+  const remove = (id: string) =>
     setBag((current) => {
       const next = { ...current };
       delete next[id];
       return next;
     });
   useEffect(() => {
+    const controller = new AbortController();
+    loadContent(controller.signal)
+      .then((snapshot) => {
+        setContent(snapshot.content || {});
+        setItems((snapshot.storefront?.products || []).filter((item) => item.availability !== "hidden"));
+        setContentState("ready");
+      })
+      .catch((error) => {
+        if (error?.name !== "AbortError") setContentState("error");
+      });
     const url = new URL(window.location.href);
-    const id = Number(url.searchParams.get("add"));
-    const item = items.find((candidate) => candidate.id === id);
-    if (!item || item.status !== "available") return;
-    queueMicrotask(() => {
-      setBag((current) => ({ ...current, [id]: true }));
-      setOpen(true);
-      url.searchParams.delete("add");
-      window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-    });
+    const id = url.searchParams.get("add");
+    if (id) queueMicrotask(() => setBag((current) => ({ ...current, [id]: true })));
+    return () => controller.abort();
   }, []);
   return (
     <main>
@@ -81,13 +92,12 @@ export default function Home() {
         <div className="heroCopy">
           <p className="kicker">AJ’s Closet & Things</p>
           <h1>
-            Shop current
+            {contentText(content, "home.hero.heading", "Shop current")}
             <br />
             <em>listings.</em>
           </h1>
           <p>
-            Browse a changing selection of quality secondhand goods, available
-            for shipping or local pickup.
+            {contentText(content, "home.hero.subheading", "Browse a changing selection of quality secondhand goods, available for shipping or local pickup.")}
           </p>
           <a href="#finds">
             Browse current listings <ArrowRight />
@@ -124,50 +134,44 @@ export default function Home() {
             </button>
           ))}
         </div>
-        <p className="sample">
-          Sample inventory for the preview. Real items, photos, prices, and
-          condition notes will replace these before launch.
-        </p>
+        {contentState === "error" && <p className="sample">Current listings could not load. Please refresh the page.</p>}
         <div className="items">
           {shown.map((i) => (
-            <article className={"listing " + i.status} key={i.id}>
-              <a className="artLink" href={"/products/" + i.slug}>
+            <article className={"listing " + i.availability} key={i.id}>
+              <div className="artLink">
                 <div className="art photo">
-                  <img src={i.image} alt={i.name} />
-                  <span>{i.condition}</span>
-                  {i.status !== "available" && (
-                    <b className="status">{i.status}</b>
+                  <img src={contentMediaUrl(i.images?.[0]?.url)} alt={i.images?.[0]?.alt_text || i.name} />
+                  <span>{i.category || "Current find"}</span>
+                  {i.availability !== "available" && (
+                    <b className="status">{i.availability}</b>
                   )}
                 </div>
-              </a>
+              </div>
               <div className="meta">
-                <p>{i.category}</p>
-                <h3>
-                  <a href={"/products/" + i.slug}>{i.name}</a>
-                </h3>
+                <p>{i.category || "Current find"}</p>
+                <h3>{i.name}</h3>
                 <div>
                   <span className="method">
-                    {i.fulfillment === "pickup" ? <MapPin /> : <Truck />}
-                    {fulfillmentLabel(i.fulfillment)}
+                    <Truck /> Shipping or pickup details
                   </span>
-                  <strong>${i.price}</strong>
+                  <strong>{new Intl.NumberFormat("en-US", { style: "currency", currency: i.currency || "USD" }).format(i.price_cents / 100)}</strong>
                 </div>
               </div>
               <button
-                disabled={i.status !== "available" || !!bag[i.id]}
+                disabled={i.availability !== "available" || !!bag[i.id]}
                 onClick={() => add(i.id)}
               >
                 {bag[i.id]
                   ? "In bag"
-                  : i.status === "available"
+                  : i.availability === "available"
                     ? "Add to bag"
-                    : i.status}{" "}
-                {i.status === "available" && !bag[i.id] && <Plus />}
+                    : i.availability}{" "}
+                {i.availability === "available" && !bag[i.id] && <Plus />}
               </button>
             </article>
           ))}
         </div>
-        {!shown.length && (
+        {contentState === "ready" && !shown.length && (
           <p className="nothing">
             Nothing available matches that search right now.
           </p>
@@ -225,10 +229,7 @@ export default function Home() {
             before you buy.
           </h2>
           <p>
-            Listings include current photos, measurements when relevant,
-            condition details, and any known flaws. Shippable items show
-            delivery options at checkout. Furniture and other oversized items
-            are marked for local pickup.
+            {contentText(content, "about.body", "Listings include current photos, measurements when relevant, condition details, and any known flaws. Shippable items show delivery options at checkout. Furniture and other oversized items are marked for local pickup.")}
           </p>
         </div>
       </section>
@@ -261,20 +262,20 @@ export default function Home() {
             </div>
           ) : (
             Object.keys(bag).map((id) => {
-              const i = items.find((x) => x.id === Number(id))!;
+              const i = items.find((x) => x.id === id)!;
               return (
                 <div className="bagItem" key={id}>
                   <div className="thumb photo">
-                    <img src={i.image} alt="" />
+                    <img src={contentMediaUrl(i.images?.[0]?.url)} alt="" />
                   </div>
                   <div>
                     <h3>{i.name}</h3>
-                    <p>{fulfillmentLabel(i.fulfillment)}</p>
+                    <p>Shipping or pickup details</p>
                     <button className="removeItem" onClick={() => remove(i.id)}>
                       Remove
                     </button>
                   </div>
-                  <strong>${i.price}</strong>
+                  <strong>{new Intl.NumberFormat("en-US", { style: "currency", currency: i.currency || "USD" }).format(i.price_cents / 100)}</strong>
                 </div>
               );
             })
