@@ -322,9 +322,8 @@ h2 {
 .art.photo.previewArt img {
   position: absolute;
   inset: 0;
-  height: 100%;
+  height: 320%;
   object-position: center;
-  transform: scale(3.2);
 }
 .art.photo.previewArt.shoes img,
 .art.photo.previewArt.sunglasses img {
