@@ -40,3 +40,20 @@ export function contentText(
   const value = content[key];
   return typeof value === "string" && value.trim() ? value : fallback;
 }
+
+export function contentProductToListing(product: ContentProduct) {
+  return {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    category: product.category || "Current find",
+    price: product.price_cents / 100,
+    condition: "See listing details",
+    fulfillment: "both" as const,
+    status: product.availability === "sold" ? ("sold" as const) : ("available" as const),
+    art: "photo",
+    image: contentMediaUrl(product.images?.[0]?.url),
+    description: product.description || "See the current listing for details.",
+    details: product.description ? [product.description] : [],
+  };
+}

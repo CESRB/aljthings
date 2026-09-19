@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
+  MapPin,
   Plus,
   Search,
   ShoppingBag,
@@ -9,22 +10,28 @@ import {
   X,
 } from "lucide-react";
 import {
-  contentMediaUrl,
+  contentProductToListing,
   contentText,
   loadContent,
-  type ContentProduct,
 } from "@/lib/content";
+import {
+  categories as previewCategories,
+  fulfillmentLabel,
+  listings as previewItems,
+  type Listing,
+} from "@/lib/catalog";
 export default function Home() {
   const [cat, setCat] = useState("Everything"),
     [query, setQuery] = useState(""),
     [bag, setBag] = useState<Record<string, boolean>>({}),
     [open, setOpen] = useState(false),
-    [items, setItems] = useState<ContentProduct[]>([]),
+    [items, setItems] = useState<Listing[]>(previewItems),
     [content, setContent] = useState<Record<string, unknown>>({}),
+    [usingPreview, setUsingPreview] = useState(true),
     [contentState, setContentState] = useState<"loading" | "ready" | "error">("loading");
   const cats = useMemo(
-    () => ["Everything", ...Array.from(new Set(items.map((item) => item.category).filter(Boolean))) as string[]],
-    [items],
+    () => usingPreview ? previewCategories : ["Everything", ...Array.from(new Set(items.map((item) => item.category)))],
+    [items, usingPreview],
   );
   const shown = useMemo(
     () =>
@@ -37,7 +44,7 @@ export default function Home() {
   );
   const count = Object.keys(bag).length,
     total = Object.keys(bag).reduce(
-      (sum, id) => sum + (items.find((i) => i.id === id)?.price_cents || 0) / 100,
+      (sum, id) => sum + (items.find((i) => String(i.id) === id)?.price || 0),
       0,
     );
   const add = (id: string) => {
@@ -55,7 +62,11 @@ export default function Home() {
     loadContent(controller.signal)
       .then((snapshot) => {
         setContent(snapshot.content || {});
-        setItems((snapshot.storefront?.products || []).filter((item) => item.availability !== "hidden"));
+        const products=(snapshot.storefront?.products || []).filter((item) => item.availability !== "hidden");
+        if (products.length) {
+          setItems(products.map(contentProductToListing));
+          setUsingPreview(false);
+        }
         setContentState("ready");
       })
       .catch((error) => {
@@ -137,40 +148,42 @@ export default function Home() {
         {contentState === "error" && <p className="sample">Current listings could not load. Please refresh the page.</p>}
         <div className="items">
           {shown.map((i) => (
-            <article className={"listing " + i.availability} key={i.id}>
-              <div className="artLink">
+            <article className={"listing " + i.status} key={i.id}>
+              <a className="artLink" href={"/products/" + i.slug}>
                 <div className="art photo">
-                  <img src={contentMediaUrl(i.images?.[0]?.url)} alt={i.images?.[0]?.alt_text || i.name} />
-                  <span>{i.category || "Current find"}</span>
-                  {i.availability !== "available" && (
-                    <b className="status">{i.availability}</b>
+                  <img src={i.image} alt={i.name} />
+                  <span>{i.condition}</span>
+                  {i.status !== "available" && (
+                    <b className="status">{i.status}</b>
                   )}
                 </div>
-              </div>
+              </a>
               <div className="meta">
-                <p>{i.category || "Current find"}</p>
-                <h3>{i.name}</h3>
+                <p>{i.category}</p>
+                <h3><a href={"/products/" + i.slug}>{i.name}</a></h3>
                 <div>
                   <span className="method">
-                    <Truck /> Shipping or pickup details
+                    {i.fulfillment === "pickup" ? <MapPin /> : <Truck />}
+                    {fulfillmentLabel(i.fulfillment)}
                   </span>
-                  <strong>{new Intl.NumberFormat("en-US", { style: "currency", currency: i.currency || "USD" }).format(i.price_cents / 100)}</strong>
+                  <strong>${i.price}</strong>
                 </div>
               </div>
               <button
-                disabled={i.availability !== "available" || !!bag[i.id]}
-                onClick={() => add(i.id)}
+                disabled={i.status !== "available" || !!bag[String(i.id)]}
+                onClick={() => add(String(i.id))}
               >
-                {bag[i.id]
+                {bag[String(i.id)]
                   ? "In bag"
-                  : i.availability === "available"
+                  : i.status === "available"
                     ? "Add to bag"
-                    : i.availability}{" "}
-                {i.availability === "available" && !bag[i.id] && <Plus />}
+                    : i.status}{" "}
+                {i.status === "available" && !bag[String(i.id)] && <Plus />}
               </button>
             </article>
           ))}
         </div>
+        {usingPreview && <p className="sample">Sample inventory for the preview. Published CESRB Content replaces these items automatically.</p>}
         {contentState === "ready" && !shown.length && (
           <p className="nothing">
             Nothing available matches that search right now.
@@ -262,20 +275,20 @@ export default function Home() {
             </div>
           ) : (
             Object.keys(bag).map((id) => {
-              const i = items.find((x) => x.id === id)!;
+              const i = items.find((x) => String(x.id) === id)!;
               return (
                 <div className="bagItem" key={id}>
                   <div className="thumb photo">
-                    <img src={contentMediaUrl(i.images?.[0]?.url)} alt="" />
+                    <img src={i.image} alt="" />
                   </div>
                   <div>
                     <h3>{i.name}</h3>
-                    <p>Shipping or pickup details</p>
-                    <button className="removeItem" onClick={() => remove(i.id)}>
+                    <p>{fulfillmentLabel(i.fulfillment)}</p>
+                    <button className="removeItem" onClick={() => remove(String(i.id))}>
                       Remove
                     </button>
                   </div>
-                  <strong>{new Intl.NumberFormat("en-US", { style: "currency", currency: i.currency || "USD" }).format(i.price_cents / 100)}</strong>
+                  <strong>${i.price}</strong>
                 </div>
               );
             })
