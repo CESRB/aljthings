@@ -105,20 +105,43 @@ export function contentText(
   return typeof value === "string" && value.trim() ? value : fallback;
 }
 
+function productDescriptionParts(description: string | undefined) {
+  const raw = description?.trim() || "";
+  const condition = raw.match(/\bCondition:\s*(.*?)(?=\.\s+(?:Example status|Fulfillment|Details):|$)/i)?.[1]?.trim();
+  const fulfillmentText = raw.match(/\bFulfillment:\s*(.*?)(?=\.\s+(?:Details):|$)/i)?.[1]?.trim().toLowerCase();
+  const detailsText = raw.match(/\bDetails:\s*(.*)$/i)?.[1]?.trim().replace(/\.$/, "");
+  const summary = raw.split(/\s+(?=(?:Condition|Example status|Fulfillment|Details):)/i)[0]?.trim();
+  const fulfillment = fulfillmentText === "local pickup"
+    ? "pickup"
+    : fulfillmentText === "shipping"
+      ? "shipping"
+      : "both";
+
+  return {
+    condition: condition || "See listing details",
+    fulfillment: fulfillment as "shipping" | "pickup" | "both",
+    description: summary || "See the current listing for details.",
+    details: detailsText
+      ? detailsText.split(";").map((detail) => detail.trim()).filter(Boolean)
+      : [],
+  };
+}
+
 export function contentProductToListing(product: ContentProduct) {
+  const description = productDescriptionParts(product.description);
   return {
     id: product.id,
     slug: product.slug,
     name: product.name,
     category: product.category || "Current find",
     price: product.price_cents / 100,
-    condition: "See listing details",
-    fulfillment: "both" as "shipping" | "pickup" | "both",
+    condition: description.condition,
+    fulfillment: description.fulfillment,
     status: product.availability === "sold" ? ("sold" as const) : ("available" as const),
     art: "photo",
     image: contentMediaUrl(product.images?.[0]?.url),
-    description: product.description || "See the current listing for details.",
-    details: product.description ? [product.description] : [],
+    description: description.description,
+    details: description.details,
     commerce: product.commerce,
   };
 }
