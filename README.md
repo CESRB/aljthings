@@ -33,7 +33,10 @@ Production content is owned by CESRB Content under the `aljthings` site. Publish
 products are the storefront's only inventory source; published Lists, Gallery
 images, Blog posts, and Site Content render without a code change. If Content is
 temporarily unavailable, the catalog reports that condition instead of displaying
-hardcoded inventory. Checkout uses the
+hardcoded inventory. Product descriptions may include `Condition:`,
+`Fulfillment:`, and semicolon-separated `Details:` labels; the storefront renders
+those values as the condition badge, fulfillment method, and detail list without
+duplicating the description. Checkout uses the
 Pagesby same-origin `/_cesrb/commerce/*` gateway and redirects to the payment URL
 returned by CESRB Commerce/Billing. Card data is never collected by this site.
 
