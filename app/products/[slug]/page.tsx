@@ -1,31 +1,26 @@
 import { ArrowLeft, Check, MapPin, ShieldCheck, Truck } from "lucide-react";
-import { findListing, fulfillmentLabel, listings } from "@/lib/catalog";
+import { fulfillmentLabel } from "@/lib/catalog";
 import { contentImage, contentProductToListing, contentText, loadContent } from "@/lib/content";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
 async function managedListings() {
-  try {
-    const snapshot = await loadContent();
-    return (snapshot.storefront?.products || [])
-      .filter((item) => item.availability !== "hidden")
-      .map(contentProductToListing);
-  } catch {
-    return [];
-  }
+  const snapshot = await loadContent(undefined, "force-cache");
+  return (snapshot.storefront?.products || [])
+    .filter((item) => item.availability !== "hidden")
+    .map(contentProductToListing);
 }
 
 export async function generateStaticParams() {
-  const managed = await managedListings();
-  return (managed.length ? managed : listings).map((item) => ({ slug: item.slug }));
+  return (await managedListings()).map((item) => ({ slug: item.slug }));
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const snapshot = await loadContent().catch(() => ({ content: {}, storefront: { products: [] } }));
+  const snapshot = await loadContent(undefined, "force-cache");
   const content = snapshot.content || {};
   const managed = (snapshot.storefront?.products || []).filter((product) => product.availability !== "hidden").map(contentProductToListing);
-  const item = managed.find((candidate) => candidate.slug === slug) || findListing(slug);
+  const item = managed.find((candidate) => candidate.slug === slug);
   if (!item) notFound();
   const canBuy = item.status === "available";
 

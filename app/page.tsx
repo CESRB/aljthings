@@ -22,9 +22,7 @@ import {
 } from "@/lib/content";
 import { addCommerceItem, removeCommerceItem } from "@/lib/commerce";
 import {
-  categories as previewCategories,
   fulfillmentLabel,
-  listings as previewItems,
   type Listing,
 } from "@/lib/catalog";
 export default function Home() {
@@ -32,17 +30,16 @@ export default function Home() {
     [query, setQuery] = useState(""),
     [bag, setBag] = useState<Record<string, { commerceItemId?: string }>>({}),
     [open, setOpen] = useState(false),
-    [items, setItems] = useState<Listing[]>(previewItems),
+    [items, setItems] = useState<Listing[]>([]),
     [content, setContent] = useState<Record<string, unknown>>({}),
     [collections, setCollections] = useState<ContentCollection[]>([]),
     [posts, setPosts] = useState<ContentPost[]>([]),
     [gallery, setGallery] = useState<GalleryItem[]>([]),
     [commerceError, setCommerceError] = useState(""),
-    [usingPreview, setUsingPreview] = useState(true),
     [contentState, setContentState] = useState<"loading" | "ready" | "error">("loading");
   const cats = useMemo(
-    () => usingPreview ? previewCategories : ["Everything", ...Array.from(new Set(items.map((item) => item.category)))],
-    [items, usingPreview],
+    () => ["Everything", ...Array.from(new Set(items.map((item) => item.category)))],
+    [items],
   );
   const shown = useMemo(
     () =>
@@ -96,11 +93,8 @@ export default function Home() {
         setCollections(snapshot.collections || []);
         setPosts(snapshot.blog || []);
         const products=(snapshot.storefront?.products || []).filter((item) => item.availability !== "hidden");
-        const resolvedItems = products.length ? products.map(contentProductToListing) : previewItems;
-        if (products.length) {
-          setItems(resolvedItems);
-          setUsingPreview(false);
-        }
+        const resolvedItems = products.map(contentProductToListing);
+        setItems(resolvedItems);
         const requestedItem = requestedAdd ? resolvedItems.find((candidate) => String(candidate.id) === requestedAdd || candidate.slug === requestedAdd) : undefined;
         if (requestedItem) {
           if (requestedItem.commerce) {
@@ -198,7 +192,8 @@ export default function Home() {
             </button>
           ))}
         </div>
-        {contentState === "error" && <p className="sample">Current listings could not load. Please refresh the page.</p>}
+        {contentState === "loading" && <p className="nothing" role="status">Loading current products…</p>}
+        {contentState === "error" && <p className="nothing" role="alert">Current products are temporarily unavailable. Please check back shortly.</p>}
         <div className="items">
           {shown.map((i) => (
             <article className={"listing " + i.status} key={i.id}>
@@ -236,10 +231,9 @@ export default function Home() {
             </article>
           ))}
         </div>
-        {usingPreview && <p className="sample">Sample inventory for the preview. Published CESRB Content replaces these items automatically.</p>}
         {contentState === "ready" && !shown.length && (
           <p className="nothing">
-            Nothing available matches that search right now.
+            {items.length ? "Nothing available matches that search right now." : "No products are currently listed. Please check back soon."}
           </p>
         )}
       </section>
@@ -361,8 +355,8 @@ export default function Home() {
               <strong>${total.toFixed(2)}</strong>
             </div>
             {commerceError && <p className="checkoutError" role="alert">{commerceError}</p>}
-            <p>{usingPreview ? "Checkout is unavailable for sample inventory." : "Secure checkout opens after shipping or pickup details are confirmed."}</p>
-            <a className={usingPreview ? "checkoutButton disabled" : "checkoutButton"} href={usingPreview ? undefined : "/checkout"} aria-disabled={usingPreview}>Continue to checkout</a>
+            <p>Secure checkout opens after shipping or pickup details are confirmed.</p>
+            <a className="checkoutButton" href="/checkout">Continue to checkout</a>
           </div>
         )}
       </aside>
