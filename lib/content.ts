@@ -73,10 +73,13 @@ export function contentImage(
   return { url: fallback, alt: "" };
 }
 
-export async function loadContent(signal?: AbortSignal): Promise<ContentSnapshot> {
+export async function loadContent(
+  signal?: AbortSignal,
+  cache: RequestCache = "no-store",
+): Promise<ContentSnapshot> {
   const response = await fetch(
     `${CONTENT_ORIGIN}/public/v1/sites/${CONTENT_SITE}/snapshot?frontend=2`,
-    { cache: "no-store", signal },
+    { cache, signal },
   );
   if (!response.ok) throw new Error(`content_${response.status}`);
   return response.json() as Promise<ContentSnapshot>;
@@ -110,7 +113,7 @@ export function contentProductToListing(product: ContentProduct) {
     category: product.category || "Current find",
     price: product.price_cents / 100,
     condition: "See listing details",
-    fulfillment: "both" as const,
+    fulfillment: "both" as "shipping" | "pickup" | "both",
     status: product.availability === "sold" ? ("sold" as const) : ("available" as const),
     art: "photo",
     image: contentMediaUrl(product.images?.[0]?.url),
