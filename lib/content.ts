@@ -105,6 +105,15 @@ export function contentText(
   return typeof value === "string" && value.trim() ? value : fallback;
 }
 
+export function isSampleProduct(product: ContentProduct) {
+  const name = product.name?.trim().toLowerCase() || "";
+  const slug = product.slug?.trim().toLowerCase() || "";
+  const description = product.description?.trim().toLowerCase() || "";
+  return name.startsWith("sample -")
+    || slug.startsWith("sample-")
+    || description.startsWith("sample listing");
+}
+
 function productDescriptionParts(description: string | undefined) {
   const raw = description?.trim() || "";
   const condition = raw.match(/\bCondition:\s*(.*?)(?=\.\s+(?:Example status|Fulfillment|Details):|$)/i)?.[1]?.trim();
