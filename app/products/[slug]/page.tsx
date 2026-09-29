@@ -33,8 +33,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       </header>
       <div className="productLayout">
         <section className="gallery">
-          <div className="productHeroArt art photo">
-            <img src={item.image} alt={item.name} /><span>{item.condition}</span>
+          <div className={"productHeroArt art" + (item.image ? " photo" : "")}>
+            {item.image && <img src={item.image} alt={item.name} />}<span>{item.condition}</span>
             {item.status !== "available" && <b className="status">{item.status}</b>}
           </div>
         </section>
