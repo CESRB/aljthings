@@ -198,8 +198,8 @@ export default function Home() {
           {shown.map((i) => (
             <article className={"listing " + i.status} key={i.id}>
               <a className="artLink" href={"/products/" + i.slug}>
-                <div className="art photo">
-                  <img src={i.image} alt={i.name} />
+                <div className={"art" + (i.image ? " photo" : "")}>
+                  {i.image && <img src={i.image} alt={i.name} />}
                   <span>{i.condition}</span>
                   {i.status !== "available" && (
                     <b className="status">{i.status}</b>
@@ -305,9 +305,7 @@ export default function Home() {
           <img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} />
         </a>
         <p>{contentText(content, "footer.tagline", "Secondhand goods · Local pickup and select shipping")}</p>
-        <small>
-          {contentText(content, "footer.status", "Store preview")} · <a href="https://tech.cesrb.com">CESRB//BUILT</a>
-        </small>
+        <small><a href="https://tech.cesrb.com">CESRB//BUILT</a></small>
       </footer>
       {open && <div className="scrim" onClick={() => setOpen(false)} />}
       <aside className={open ? "drawer open" : "drawer"} aria-hidden={!open}>
@@ -332,8 +330,8 @@ export default function Home() {
               const i = items.find((x) => String(x.id) === id)!;
               return (
                 <div className="bagItem" key={id}>
-                  <div className="thumb photo">
-                    <img src={i.image} alt="" />
+                  <div className={"thumb" + (i.image ? " photo" : "")}>
+                    {i.image && <img src={i.image} alt="" />}
                   </div>
                   <div>
                     <h3>{i.name}</h3>

@@ -280,11 +280,6 @@ h2 {
   color: white;
   box-shadow: inset 0 -3px var(--gold);
 }
-.sample {
-  font-size: 0.78rem;
-  color: var(--muted);
-  margin-bottom: 1.5rem;
-}
 .items {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -299,18 +294,6 @@ h2 {
 .art {
   aspect-ratio: 4/3;
   border: 1px solid #c8c1b8;
-}
-.art:before,
-.thumb:before {
-  content: "";
-  position: absolute;
-  inset: 18% 24%;
-  background: #555;
-  box-shadow: 0 15px 30px #0004;
-}
-.art.photo:before,
-.thumb.photo:before {
-  display: none;
 }
 .art.photo img,
 .thumb.photo img {
@@ -354,157 +337,6 @@ h2 {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   box-shadow: 5px 5px 0 #0006;
-}
-.shoes {
-  background: linear-gradient(145deg, #c9c1b5, #8e8274);
-}
-.shoes:before {
-  background: #6d3d25;
-  border-radius: 60% 15% 18% 45%;
-  inset: 40% 14% 18%;
-}
-.watch {
-  background: #29272b;
-}
-.watch:before {
-  background: radial-gradient(
-    circle,
-    #202126 0 27%,
-    #c2a044 28% 39%,
-    #5e5c60 40%
-  );
-  border-radius: 50%;
-  inset: 18% 30%;
-}
-.sweater {
-  background: #b7b2ad;
-}
-.sweater:before {
-  background: #403948;
-  clip-path: polygon(
-    20% 5%,
-    40% 0,
-    50% 15%,
-    60% 0,
-    80% 5%,
-    100% 28%,
-    82% 43%,
-    77% 100%,
-    23% 100%,
-    18% 43%,
-    0 28%
-  );
-}
-.table {
-  background: #555057;
-}
-.table:before {
-  background: #6d4930;
-  inset: 22% 18% 38%;
-  box-shadow:
-    -35px 100px 0 -30px #3a2a20,
-    35px 100px 0 -30px #3a2a20;
-}
-.grill {
-  background: #aaa5a0;
-}
-.grill:before {
-  background: #1d1d1e;
-  border-radius: 50% 50% 20% 20%;
-  inset: 18% 25% 25%;
-}
-.lamp {
-  background: #4b4650;
-}
-.lamp:before {
-  background:
-    linear-gradient(#d2a642 0 38%, transparent 39%),
-    linear-gradient(90deg, transparent 47%, #242124 48% 52%, transparent 53%);
-  clip-path: polygon(
-    20% 0,
-    80% 0,
-    100% 38%,
-    53% 39%,
-    53% 88%,
-    80% 100%,
-    20% 100%,
-    47% 88%,
-    47% 39%,
-    0 38%
-  );
-}
-.glasses {
-  background: linear-gradient(145deg, #c8c2b8, #817b76);
-}
-.glasses:before {
-  inset: 38% 18%;
-  border: 14px solid #242126;
-  border-radius: 45%;
-  background: transparent;
-  box-shadow:
-    128px 0 0 -14px #242126,
-    64px -9px 0 -10px #242126;
-}
-.drill {
-  background: #b7b3ad;
-}
-.drill:before {
-  inset: 20% 24% 34%;
-  border-radius: 20% 8% 12% 25%;
-  background: #4f2868;
-  box-shadow: 42px 18px 0 -18px #232124;
-}
-.stools {
-  background: #8b8176;
-}
-.stools:before {
-  inset: 18% 14% 55%;
-  background: #68442d;
-  box-shadow:
-    -20px 105px 0 -26px #252327,
-    20px 105px 0 -26px #252327,
-    120px 0 0 #68442d,
-    100px 105px 0 -26px #252327,
-    140px 105px 0 -26px #252327;
-}
-.speaker {
-  background: #302d32;
-}
-.speaker:before {
-  inset: 18% 30%;
-  border-radius: 22px;
-  background:
-    radial-gradient(
-      circle at 50% 70%,
-      #151416 0 24%,
-      #4a474d 25% 31%,
-      transparent 32%
-    ),
-    radial-gradient(
-      circle at 50% 28%,
-      #151416 0 13%,
-      #4a474d 14% 19%,
-      transparent 20%
-    ),
-    #242226;
-}
-.cooler {
-  background: #9b978d;
-}
-.cooler:before {
-  inset: 26% 16% 18%;
-  border-radius: 10px 10px 18px 18px;
-  background: linear-gradient(#ded7c7 0 18%, #51604d 19%);
-}
-.belt {
-  background: #d0c6b7;
-}
-.belt:before {
-  inset: 18%;
-  border: 24px solid #6f452b;
-  border-radius: 50%;
-  background: transparent;
-  box-shadow: inset 0 0 0 5px #c59a42;
 }
 .meta {
   padding: 1rem 0.1rem;

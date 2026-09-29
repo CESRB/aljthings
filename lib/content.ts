@@ -52,7 +52,7 @@ export type ContentSnapshot = {
 };
 
 export function contentMediaUrl(path: string | undefined) {
-  return path ? new URL(path, CONTENT_ORIGIN).href : "/brand/aj-monogram-spaced.png";
+  return path ? new URL(path, CONTENT_ORIGIN).href : "";
 }
 
 export function contentImage(
