@@ -12,7 +12,10 @@ async function managedListings() {
 }
 
 export async function generateStaticParams() {
-  return (await managedListings()).map((item) => ({ slug: item.slug }));
+  const listings = await managedListings();
+  return listings.length
+    ? listings.map((item) => ({ slug: item.slug }))
+    : [{ slug: "_catalog-empty" }];
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
