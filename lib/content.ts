@@ -78,7 +78,7 @@ export async function loadContent(
   cache: RequestCache = "no-store",
 ): Promise<ContentSnapshot> {
   const response = await fetch(
-    `${CONTENT_ORIGIN}/public/v1/sites/${CONTENT_SITE}/snapshot?frontend=2`,
+    `${CONTENT_ORIGIN}/public/v1/sites/${CONTENT_SITE}/snapshot?frontend=2&catalog_revision=20260930`,
     { cache, signal },
   );
   if (!response.ok) throw new Error(`content_${response.status}`);
