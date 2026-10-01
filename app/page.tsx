@@ -197,7 +197,7 @@ export default function Home() {
         <div className="items">
           {shown.map((i) => (
             <article className={"listing " + i.status} key={i.id}>
-              <a className="artLink" href={"/products/" + i.slug}>
+              <a className="artLink" href={"/products?slug=" + encodeURIComponent(i.slug)}>
                 <div className={"art" + (i.image ? " photo" : "")}>
                   {i.image && <img src={i.image} alt={i.name} />}
                   <span>{i.condition}</span>
@@ -208,7 +208,7 @@ export default function Home() {
               </a>
               <div className="meta">
                 <p>{i.category}</p>
-                <h3><a href={"/products/" + i.slug}>{i.name}</a></h3>
+                <h3><a href={"/products?slug=" + encodeURIComponent(i.slug)}>{i.name}</a></h3>
                 <div>
                   <span className="method">
                     {i.fulfillment === "pickup" ? <MapPin /> : <Truck />}
