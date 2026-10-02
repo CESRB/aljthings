@@ -44,4 +44,4 @@ Before customer launch, complete Onboarding activation so Commerce provisions th
 store, configure at least one shipping or pickup method, and publish inventory in
 Content.
 
-Built by [CESRB](https://tech.cesrb.com).
+Built by [CESRB Creative](https://cesrbcreative.com/).

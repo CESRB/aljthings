@@ -64,7 +64,7 @@ export default function ProductPage() {
           </section>
         </div>
       )}
-      <footer><Link href="/" className="wordmark light"><img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} /></Link><p>{contentText(content, "footer.tagline", "Secondhand goods · Local pickup and select shipping")}</p><small><a href="https://tech.cesrb.com">CESRB//BUILT</a></small></footer>
+      <footer><Link href="/" className="wordmark light"><img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} /></Link><p>{contentText(content, "footer.tagline", "Secondhand goods · Local pickup and select shipping")}</p><small><a href="https://cesrbcreative.com/">CESRB//BUILT</a></small></footer>
     </main>
   );
 }
