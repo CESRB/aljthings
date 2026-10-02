@@ -305,7 +305,7 @@ export default function Home() {
           <img src={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").url} alt={contentImage(content, "brand.header_logo", "/brand/aj-logo-horizontal.png").alt || "AJ's Closet & Things"} />
         </a>
         <p>{contentText(content, "footer.tagline", "Secondhand goods · Local pickup and select shipping")}</p>
-        <small><a href="https://tech.cesrb.com">CESRB//BUILT</a></small>
+        <small><a href="https://cesrbcreative.com/">CESRB//BUILT</a></small>
       </footer>
       {open && <div className="scrim" onClick={() => setOpen(false)} />}
       <aside className={open ? "drawer open" : "drawer"} aria-hidden={!open}>
